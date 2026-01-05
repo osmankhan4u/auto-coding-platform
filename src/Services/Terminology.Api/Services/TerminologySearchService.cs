@@ -7,13 +7,13 @@ namespace Terminology.Api.Services;
 
 public sealed class TerminologySearchService
 {
-    private const int DefaultEmbeddingDimensions = 1536;
-    private const string DefaultEmbeddingModel = "local-fake-v1";
     private readonly TerminologyDbContext _dbContext;
+    private readonly IEmbeddingProvider _embeddingProvider;
 
-    public TerminologySearchService(TerminologyDbContext dbContext)
+    public TerminologySearchService(TerminologyDbContext dbContext, IEmbeddingProvider embeddingProvider)
     {
         _dbContext = dbContext;
+        _embeddingProvider = embeddingProvider;
     }
 
     public async Task<IReadOnlyList<TerminologyHitDto>> SearchAsync(
@@ -25,7 +25,7 @@ public sealed class TerminologySearchService
         var excludeHeaders = ParseFlag(request.ExcludeHeaders);
         var topN = Math.Clamp(request.TopN, 1, 50);
         var queryText = request.QueryText ?? string.Empty;
-        var embedding = CreateZeroVector(DefaultEmbeddingDimensions);
+        var embedding = await _embeddingProvider.EmbedAsync(queryText, cancellationToken);
 
         var sql = """
         WITH query_params AS (
@@ -59,9 +59,9 @@ public sealed class TerminologySearchService
         vec_rank AS (
             SELECT
                 e.concept_id,
-                (1 - (e.embedding <=> @embedding)) AS vec_sim
+                (1 - (e.embedding <=> @qvec)) AS vec_sim
             FROM terminology_embedding e
-            WHERE e.model = @embeddingModel
+            WHERE e.model = @modelId
         )
         SELECT
             b.code,
@@ -91,8 +91,8 @@ public sealed class TerminologySearchService
         {
             new NpgsqlParameter("queryText", queryText),
             new NpgsqlParameter("codeVersionId", codeVersionId),
-            new NpgsqlParameter("embedding", embedding),
-            new NpgsqlParameter("embeddingModel", DefaultEmbeddingModel),
+            new NpgsqlParameter("qvec", embedding),
+            new NpgsqlParameter("modelId", _embeddingProvider.ModelId),
             new NpgsqlParameter("isBillableOnly", isBillableOnly),
             new NpgsqlParameter("excludeHeaders", excludeHeaders),
             new NpgsqlParameter("topN", topN)
@@ -118,8 +118,4 @@ public sealed class TerminologySearchService
         return bool.TryParse(value, out var result) && result;
     }
 
-    private static float[] CreateZeroVector(int dimensions)
-    {
-        return new float[dimensions];
-    }
 }

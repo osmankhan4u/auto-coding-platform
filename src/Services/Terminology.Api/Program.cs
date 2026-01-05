@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TerminologyDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("TerminologyDb")));
 
+builder.Services.AddSingleton<IEmbeddingProvider, FakeEmbeddingProvider>();
 builder.Services.AddScoped<TerminologySearchService>();
 
 var app = builder.Build();
