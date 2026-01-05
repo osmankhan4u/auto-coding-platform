@@ -6,6 +6,7 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.Services.Configure<TerminologyOptions>(builder.Configuration.GetSection("Terminology"));
 
 builder.Services.AddSingleton<SafetyGate>();
+builder.Services.AddSingleton<RadiologyIcdPolicy>();
 builder.Services.AddSingleton<RadiologyCodingService>();
 builder.Services.AddHttpClient<TerminologyClient>((serviceProvider, client) =>
 {
