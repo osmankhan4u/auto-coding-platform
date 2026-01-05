@@ -9,15 +9,18 @@ public sealed class RadiologyCodingService
     private const int TerminologyTopN = 10;
     private readonly TerminologyClient _terminologyClient;
     private readonly SafetyGate _safetyGate;
+    private readonly RadiologyIcdPolicy _policy;
     private readonly ILogger<RadiologyCodingService> _logger;
 
     public RadiologyCodingService(
         TerminologyClient terminologyClient,
         SafetyGate safetyGate,
+        RadiologyIcdPolicy policy,
         ILogger<RadiologyCodingService> logger)
     {
         _terminologyClient = terminologyClient;
         _safetyGate = safetyGate;
+        _policy = policy;
         _logger = logger;
     }
 
@@ -37,11 +40,11 @@ public sealed class RadiologyCodingService
 
         var safetyResult = _safetyGate.Evaluate(encounter);
         var primaryConcepts = encounter.Concepts
-            .Where(concept => IsIndicationConcept(concept) && !IsExcludedConcept(concept))
+            .Where(concept => _policy.IsEligibleForPrimary(concept))
             .ToList();
 
         var secondaryConcepts = encounter.Concepts
-            .Where(concept => !IsIndicationConcept(concept) && !IsExcludedConcept(concept))
+            .Where(concept => !_policy.IsEligibleForPrimary(concept) && !IsExcludedConcept(concept))
             .ToList();
 
         var primaryCandidates = await BuildCandidatesAsync(primaryConcepts, trace, cancellationToken, applySuspectedPenalty: true);
@@ -128,9 +131,6 @@ public sealed class RadiologyCodingService
             .OrderByDescending(candidate => candidate.Score)
             .ToList();
     }
-
-    private static bool IsIndicationConcept(RadiologyConcept concept) =>
-        string.Equals(concept.SourcePriority, "INDICATION", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsExcludedConcept(RadiologyConcept concept) =>
         string.Equals(concept.Certainty, "RULED_OUT", StringComparison.OrdinalIgnoreCase) ||
