@@ -12,7 +12,7 @@ public sealed class TerminologyConcept
     public bool IsBillable { get; set; }
     public bool IsHeader { get; set; }
     public string SearchText { get; set; } = string.Empty;
-    public NpgsqlTsVector SearchTsv { get; set; } = new();
+    public NpgsqlTsVector? SearchTsv { get; set; }
 
     public TerminologyCodeVersion? CodeVersion { get; set; }
     public ICollection<TerminologyAlias> Aliases { get; set; } = new List<TerminologyAlias>();

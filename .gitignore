@@ -1,0 +1,114 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio
+.vs/
+*.user
+*.userosscache
+*.suo
+*.cache
+*.docstates
+*.pdb
+*.psess
+*.vsp
+*.vspx
+*.vssscc
+*.scc
+*.VC.db
+*.VC.VC.opendb
+*.ncb
+*.aps
+*.pch
+*.ipch
+*.[Cc]ache
+*.tlog
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.log
+*.obj
+*.tmp
+*.tmp_proj
+*.xproj
+*.dbmdl
+*.jfm
+*.opendb
+*.vcxproj.user
+
+## Visual Studio Code
+.vscode/
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+
+## Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+## NUnit
+*.VisualState.xml
+TestResult.xml
+TestResults/
+
+## DotCover
+*.dotCover
+
+## NCrunch
+*.ncrunch*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+## Coverlet
+coverage*.json
+coverage*.xml
+coverage*.info
+
+## Azure publish outputs
+*.azurePubxml
+*.publishproj
+PublishScripts/
+*.Publish.xml
+*.pubxml
+*.pubxml.user
+
+## NuGet packages
+*.nupkg
+*.snupkg
+**/packages/*
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.assets.json
+packages.config
+
+## IIS
+IISExpress/
+appsettings.*.json
+
+## OS files
+[Tt]humbs.db
+[Dd]esktop.ini
+.DS_Store
+
+## Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+## Python
+__pycache__/
+*.pyc
+
+## Database and local data
+*.db
+*.sqlite
+*.sqlite3
+
+## Tools
+*.cache/
+

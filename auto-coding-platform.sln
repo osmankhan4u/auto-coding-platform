@@ -1,0 +1,56 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{984BB9B3-3FA3-BE33-9484-CAC21695A33C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{0C2F4580-3A4A-4D0B-95A7-8C1C5A6F03B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coding.Worker", "src\Services\Coding.Worker\Coding.Worker.csproj", "{D4874389-6DAE-6B79-DC08-7CBA25EB0A04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coding.Worker.Tests", "src\Services\Coding.Worker.Tests\Coding.Worker.Tests.csproj", "{A4F27827-9D96-04B2-0630-750F81353FD6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminology.Api", "src\Services\Terminology.Api\Terminology.Api.csproj", "{B9C0487B-788F-D17C-6FF7-220A68E4F493}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminology.Loader", "src\Tools\Terminology.Loader\Terminology.Loader.csproj", "{F2A32B8D-8E7B-4E1C-9D7F-3F8B17C0D6E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4874389-6DAE-6B79-DC08-7CBA25EB0A04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4874389-6DAE-6B79-DC08-7CBA25EB0A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4874389-6DAE-6B79-DC08-7CBA25EB0A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4874389-6DAE-6B79-DC08-7CBA25EB0A04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4F27827-9D96-04B2-0630-750F81353FD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4F27827-9D96-04B2-0630-750F81353FD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4F27827-9D96-04B2-0630-750F81353FD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4F27827-9D96-04B2-0630-750F81353FD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9C0487B-788F-D17C-6FF7-220A68E4F493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9C0487B-788F-D17C-6FF7-220A68E4F493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9C0487B-788F-D17C-6FF7-220A68E4F493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9C0487B-788F-D17C-6FF7-220A68E4F493}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2A32B8D-8E7B-4E1C-9D7F-3F8B17C0D6E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2A32B8D-8E7B-4E1C-9D7F-3F8B17C0D6E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2A32B8D-8E7B-4E1C-9D7F-3F8B17C0D6E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2A32B8D-8E7B-4E1C-9D7F-3F8B17C0D6E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{984BB9B3-3FA3-BE33-9484-CAC21695A33C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{D4874389-6DAE-6B79-DC08-7CBA25EB0A04} = {984BB9B3-3FA3-BE33-9484-CAC21695A33C}
+		{A4F27827-9D96-04B2-0630-750F81353FD6} = {984BB9B3-3FA3-BE33-9484-CAC21695A33C}
+		{B9C0487B-788F-D17C-6FF7-220A68E4F493} = {984BB9B3-3FA3-BE33-9484-CAC21695A33C}
+		{0C2F4580-3A4A-4D0B-95A7-8C1C5A6F03B9} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{F2A32B8D-8E7B-4E1C-9D7F-3F8B17C0D6E8} = {0C2F4580-3A4A-4D0B-95A7-8C1C5A6F03B9}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ED945279-BAE5-4895-8C28-F8A6C28CCDF6}
+	EndGlobalSection
+EndGlobal

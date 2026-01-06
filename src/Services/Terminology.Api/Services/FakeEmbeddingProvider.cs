@@ -8,7 +8,7 @@ public sealed class FakeEmbeddingProvider : IEmbeddingProvider
     private const int EmbeddingDimensions = 1536;
     private static readonly byte[] EmptyHash = SHA256.HashData(Array.Empty<byte>());
 
-    public string ModelId => "local-fake-v1";
+    public string ModelId => "fake-embed-1536";
 
     public Task<float[]> EmbedAsync(string text, CancellationToken cancellationToken)
     {

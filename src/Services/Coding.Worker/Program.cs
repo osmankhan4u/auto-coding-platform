@@ -1,3 +1,4 @@
+using Coding.Worker;
 using Coding.Worker.Services;
 using Microsoft.Extensions.Options;
 
