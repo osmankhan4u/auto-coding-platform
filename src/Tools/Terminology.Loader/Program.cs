@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Terminology.Api.Data;
+using Terminology.Data;
 using Terminology.Loader;
 using Terminology.Loader.Pipeline;
 using Terminology.Loader.Services;
+using Terminology.Data.Services;
 
 public static class Program
 {

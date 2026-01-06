@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Terminology.Api.Data;
+using Terminology.Data;
 using Terminology.Api.Models;
 using Terminology.Api.Services;
+using Terminology.Data.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

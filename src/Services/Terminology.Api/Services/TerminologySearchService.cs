@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Terminology.Api.Data;
+using Terminology.Data;
+using Terminology.Data.Services;
 using Terminology.Api.Models;
 
 namespace Terminology.Api.Services;

@@ -1,4 +1,4 @@
-using Terminology.Api.Services;
+using Terminology.Data.Services;
 
 namespace Terminology.Loader.Services;
 

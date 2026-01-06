@@ -1,10 +1,11 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Terminology.Api.Data;
-using Terminology.Api.Services;
+using Terminology.Data;
+using Terminology.Data.Services;
 
 namespace Terminology.Loader.Pipeline;
 
@@ -44,10 +45,6 @@ public sealed class LoaderOrchestrator
         var totalStopwatch = Stopwatch.StartNew();
         await _dbContext.Database.OpenConnectionAsync(cancellationToken);
 
-        var schemaStopwatch = Stopwatch.StartNew();
-        await EnsureSchemaAsync(cancellationToken);
-        schemaStopwatch.Stop();
-
         var codeVersionGuid = _options.ResolveCodeVersionGuid();
 
         var versionStopwatch = Stopwatch.StartNew();
@@ -80,32 +77,10 @@ public sealed class LoaderOrchestrator
             Console.WriteLine($"Embeddings: inserted={embeddingCounts.Inserted}, updated={embeddingCounts.Updated}, elapsed={embedStopwatch.Elapsed}");
         }
 
-        Console.WriteLine($"Schema: elapsed={schemaStopwatch.Elapsed}");
         Console.WriteLine($"CodeVersion: elapsed={versionStopwatch.Elapsed}");
         Console.WriteLine($"Concepts: inserted={conceptCounts.Inserted}, updated={conceptCounts.Updated}, elapsed={conceptsStopwatch.Elapsed}");
         Console.WriteLine($"SearchFields: elapsed={searchStopwatch.Elapsed}");
         Console.WriteLine($"Total: elapsed={totalStopwatch.Elapsed}");
-    }
-
-    private async Task EnsureSchemaAsync(CancellationToken cancellationToken)
-    {
-        var sql = """
-        ALTER TABLE terminology_concept ADD COLUMN IF NOT EXISTS code_system character varying(50);
-        ALTER TABLE terminology_concept ADD COLUMN IF NOT EXISTS status character varying(20);
-        ALTER TABLE terminology_alias ADD COLUMN IF NOT EXISTS code_version_id uuid;
-        ALTER TABLE terminology_alias ADD COLUMN IF NOT EXISTS concept_code character varying(20);
-        ALTER TABLE terminology_embedding ADD COLUMN IF NOT EXISTS code_version_id uuid;
-        ALTER TABLE terminology_embedding ADD COLUMN IF NOT EXISTS code character varying(20);
-
-        CREATE UNIQUE INDEX IF NOT EXISTS ux_terminology_concept_code_version_code
-            ON terminology_concept (code_version_id, code);
-        CREATE UNIQUE INDEX IF NOT EXISTS ux_terminology_alias_code_version_code_alias_norm
-            ON terminology_alias (code_version_id, concept_code, alias_norm);
-        CREATE UNIQUE INDEX IF NOT EXISTS ux_terminology_embedding_code_version_code_model
-            ON terminology_embedding (code_version_id, code, model);
-        """;
-
-        await _dbContext.Database.ExecuteSqlRawAsync(sql, cancellationToken);
     }
 
     private async Task EnsureCodeVersionAsync(Guid codeVersionId, CancellationToken cancellationToken)
@@ -288,7 +263,7 @@ public sealed class LoaderOrchestrator
         CancellationToken cancellationToken)
     {
         var values = new List<string>(aliases.Count);
-        var parameters = new List<NpgsqlParameter>(aliases.Count * 3 + 1)
+        var parameters = new List<NpgsqlParameter>(aliases.Count * 4 + 1)
         {
             new NpgsqlParameter("codeVersionId", codeVersionId)
         };
@@ -296,31 +271,34 @@ public sealed class LoaderOrchestrator
         for (var i = 0; i < aliases.Count; i++)
         {
             var alias = aliases[i];
-            values.Add($"(@id{i}, @conceptCode{i}, @alias{i})");
+            values.Add($"(@id{i}, @conceptCode{i}, @alias{i}, @weight{i})");
             parameters.Add(new NpgsqlParameter($"id{i}", CreateDeterministicGuid($"{codeVersionId:N}:{alias.ConceptCode}:{alias.AliasText}")));
             parameters.Add(new NpgsqlParameter($"conceptCode{i}", alias.ConceptCode));
             parameters.Add(new NpgsqlParameter($"alias{i}", alias.AliasText));
+            parameters.Add(new NpgsqlParameter($"weight{i}", alias.Weight));
         }
 
         var sql = $"""
-        WITH alias_rows (id, concept_code, alias_text) AS (
+        WITH alias_rows (id, concept_code, alias_text, weight) AS (
             VALUES {string.Join(",", values)}
         )
-        INSERT INTO terminology_alias (id, concept_id, alias, alias_norm, code_version_id, concept_code)
+        INSERT INTO terminology_alias (id, concept_id, alias, alias_norm, code_version_id, concept_code, weight)
         SELECT
             ar.id,
             c.id,
             ar.alias_text,
             unaccent(lower(ar.alias_text)),
             @codeVersionId,
-            ar.concept_code
+            ar.concept_code,
+            ar.weight
         FROM alias_rows ar
         JOIN terminology_concept c
             ON c.code_version_id = @codeVersionId
            AND c.code = ar.concept_code
         ON CONFLICT (code_version_id, concept_code, alias_norm) DO UPDATE SET
             alias = EXCLUDED.alias,
-            concept_id = EXCLUDED.concept_id
+            concept_id = EXCLUDED.concept_id,
+            weight = EXCLUDED.weight
         RETURNING (xmax = 0) AS inserted;
         """;
 
@@ -431,12 +409,17 @@ public sealed class LoaderOrchestrator
 
             var aliasText = parts[0];
             var conceptCode = parts[1];
+            var weight = 1.0m;
+            if (parts.Length > 2 && decimal.TryParse(parts[2], NumberStyles.Number, CultureInfo.InvariantCulture, out var parsedWeight))
+            {
+                weight = parsedWeight;
+            }
             if (string.IsNullOrWhiteSpace(aliasText) || string.IsNullOrWhiteSpace(conceptCode))
             {
                 continue;
             }
 
-            aliases.Add(new AliasRow(conceptCode, aliasText));
+            aliases.Add(new AliasRow(conceptCode, aliasText, weight));
         }
 
         return aliases;

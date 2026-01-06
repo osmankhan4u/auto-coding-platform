@@ -72,7 +72,7 @@ public sealed class Icd10CmIndexParser
                     var aliasText = BuildAliasText(stack);
                     if (!string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(aliasText))
                     {
-                        yield return new AliasRow(code.Trim(), aliasText);
+                        yield return new AliasRow(code.Trim(), aliasText, 1.0m);
                     }
                 }
 

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Terminology.Api.Data.Migrations;
+namespace Terminology.Data.Migrations;
 
 public partial class InitialTerminologySchema : Migration
 {

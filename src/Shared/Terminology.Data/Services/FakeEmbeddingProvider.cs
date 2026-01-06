@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Terminology.Api.Services;
+namespace Terminology.Data.Services;
 
 public sealed class FakeEmbeddingProvider : IEmbeddingProvider
 {

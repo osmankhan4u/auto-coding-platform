@@ -1,4 +1,4 @@
-namespace Terminology.Api.Services;
+namespace Terminology.Data.Services;
 
 public interface IEmbeddingProvider
 {

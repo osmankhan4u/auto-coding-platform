@@ -1,4 +1,4 @@
-namespace Terminology.Api.Data;
+namespace Terminology.Data;
 
 public sealed class TerminologySearchRow
 {

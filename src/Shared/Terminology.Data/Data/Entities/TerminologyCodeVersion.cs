@@ -1,4 +1,4 @@
-namespace Terminology.Api.Data.Entities;
+namespace Terminology.Data.Entities;
 
 public sealed class TerminologyCodeVersion
 {
