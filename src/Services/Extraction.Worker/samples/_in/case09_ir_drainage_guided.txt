@@ -1,0 +1,4 @@
+INDICATION: Abdominal abscess.
+TECHNIQUE: IR CT GUIDANCE FOR DRAINAGE.
+FINDINGS: Drainage catheter placed.
+IMPRESSION: Successful drainage.

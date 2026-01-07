@@ -123,8 +123,9 @@ public sealed class ExtractionPipelineTests
         var extractor = new ClinicalConceptExtractor(sentenceSplitter, negationResolver, uncertaintyResolver, historyResolver, targetAwareResolver);
         var completeness = new DocumentationCompletenessScorer();
         var modalityExtractor = new ModalityBodyRegionExtractor();
+        var attributesExtractor = new RadiologyAttributesExtractor();
         registry ??= new ConceptPackRegistry();
 
-        return new RadiologyExtractionService(sectionDetector, modalityExtractor, registry, extractor, completeness);
+        return new RadiologyExtractionService(sectionDetector, modalityExtractor, attributesExtractor, registry, extractor, completeness);
     }
 }

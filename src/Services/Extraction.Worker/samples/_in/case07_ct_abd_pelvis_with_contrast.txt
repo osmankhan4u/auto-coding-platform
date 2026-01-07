@@ -1,0 +1,4 @@
+INDICATION: Abdominal pain.
+TECHNIQUE: CT ABDOMEN AND PELVIS WITH CONTRAST.
+FINDINGS: Incidental renal cyst. No bowel obstruction.
+IMPRESSION: Appendicitis.

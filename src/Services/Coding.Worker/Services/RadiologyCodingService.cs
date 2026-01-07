@@ -10,17 +10,23 @@ public sealed class RadiologyCodingService
     private readonly TerminologyClient _terminologyClient;
     private readonly SafetyGate _safetyGate;
     private readonly RadiologyIcdPolicy _policy;
+    private readonly RadiologyCptCodingService _cptCodingService;
+    private readonly IBundlingValidator _bundlingValidator;
     private readonly ILogger<RadiologyCodingService> _logger;
 
     public RadiologyCodingService(
         TerminologyClient terminologyClient,
         SafetyGate safetyGate,
         RadiologyIcdPolicy policy,
+        RadiologyCptCodingService cptCodingService,
+        IBundlingValidator bundlingValidator,
         ILogger<RadiologyCodingService> logger)
     {
         _terminologyClient = terminologyClient;
         _safetyGate = safetyGate;
         _policy = policy;
+        _cptCodingService = cptCodingService;
+        _bundlingValidator = bundlingValidator;
         _logger = logger;
     }
 
@@ -32,19 +38,24 @@ public sealed class RadiologyCodingService
         {
             PolicyDecisions =
             {
-                "Primary candidates restricted to INDICATION concepts.",
+                "Primary candidates prefer IMPRESSION concepts; fallback to INDICATION when needed.",
                 "Secondary candidates are suggestions only.",
                 "Safety gate blocks auto primary when required."
             }
         };
 
         var safetyResult = _safetyGate.Evaluate(encounter);
-        var primaryConcepts = encounter.Concepts
+        var eligiblePrimaryConcepts = encounter.Concepts
             .Where(concept => _policy.IsEligibleForPrimary(concept))
             .ToList();
 
+        var hasImpressionPrimary = eligiblePrimaryConcepts.Any(concept => _policy.GetPrimaryPriority(concept) == 0);
+        var primaryConcepts = hasImpressionPrimary
+            ? eligiblePrimaryConcepts.Where(concept => _policy.GetPrimaryPriority(concept) == 0).ToList()
+            : eligiblePrimaryConcepts.Where(concept => _policy.GetPrimaryPriority(concept) == 1).ToList();
+
         var secondaryConcepts = encounter.Concepts
-            .Where(concept => !_policy.IsEligibleForPrimary(concept) && !IsExcludedConcept(concept))
+            .Where(concept => !_policy.IsEligibleForPrimary(concept) && _policy.IsEligibleForSecondary(concept))
             .ToList();
 
         var primaryCandidates = await BuildCandidatesAsync(primaryConcepts, trace, cancellationToken, applySuspectedPenalty: true);
@@ -72,11 +83,16 @@ public sealed class RadiologyCodingService
             _logger.LogInformation("Safety gate blocked auto primary selection. Flags: {Flags}", safetyResult.Flags);
         }
 
+        var cptResult = _cptCodingService.Generate(encounter);
+        var bundlingValidation = _bundlingValidator.Validate(encounter, cptResult);
+
         return new RadiologyIcdCodingResult
         {
             PrimaryCandidates = primaryCandidates,
             SecondaryCandidates = secondaryCandidates,
             FinalSelection = finalSelection,
+            CptResult = cptResult,
+            BundlingValidation = bundlingValidation,
             SafetyFlags = safetyResult.Flags,
             Trace = trace
         };
@@ -119,9 +135,14 @@ public sealed class RadiologyCodingService
                         ShortDescription = hit.ShortDescription,
                         LongDescription = hit.LongDescription,
                         Score = score,
+                        Confidence = score,
+                        RuleId = "ICD_TERM_MATCH",
+                        RuleVersion = "1.0",
                         MatchModes = hit.MatchModes,
                         MatchedTerms = hit.MatchedTerms,
-                        EvidenceSpans = concept.EvidenceSpans
+                        EvidenceSpans = concept.EvidenceSpans,
+                        ExclusionReasons = new List<string>(),
+                        Rationale = "Terminology match from extracted clinical concept."
                     };
                 }
             }
@@ -131,10 +152,6 @@ public sealed class RadiologyCodingService
             .OrderByDescending(candidate => candidate.Score)
             .ToList();
     }
-
-    private static bool IsExcludedConcept(RadiologyConcept concept) =>
-        string.Equals(concept.Certainty, "RULED_OUT", StringComparison.OrdinalIgnoreCase) ||
-        string.Equals(concept.Polarity, "NEGATIVE", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsSuspected(RadiologyConcept concept) =>
         string.Equals(concept.Certainty, "SUSPECTED", StringComparison.OrdinalIgnoreCase);

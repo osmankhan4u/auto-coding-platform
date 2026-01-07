@@ -8,6 +8,8 @@ builder.Services.Configure<TerminologyOptions>(builder.Configuration.GetSection(
 
 builder.Services.AddSingleton<SafetyGate>();
 builder.Services.AddSingleton<RadiologyIcdPolicy>();
+builder.Services.AddSingleton<RadiologyCptCodingService>();
+builder.Services.AddSingleton<IBundlingValidator, BundlingValidator>();
 builder.Services.AddSingleton<RadiologyCodingService>();
 builder.Services.AddHttpClient<TerminologyClient>((serviceProvider, client) =>
 {

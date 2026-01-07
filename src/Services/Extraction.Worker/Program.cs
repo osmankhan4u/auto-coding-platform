@@ -13,6 +13,7 @@ builder.Services.AddSingleton<ConceptPackRegistry>();
 builder.Services.AddSingleton<DocumentationCompletenessScorer>();
 builder.Services.AddSingleton<ClinicalConceptExtractor>();
 builder.Services.AddSingleton<ModalityBodyRegionExtractor>();
+builder.Services.AddSingleton<RadiologyAttributesExtractor>();
 builder.Services.AddSingleton<RadiologyExtractionService>();
 
 builder.Services.AddHostedService<Worker>();

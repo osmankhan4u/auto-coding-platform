@@ -53,4 +53,38 @@ public sealed class RadiologyIcdPolicyTests
 
         Assert.False(isEligible);
     }
+
+    [Fact]
+    public void AcceptsImpressionConceptsForPrimary()
+    {
+        var policy = new RadiologyIcdPolicy();
+        var concept = new RadiologyConcept
+        {
+            SourcePriority = "IMPRESSION",
+            Certainty = "CONFIRMED",
+            Polarity = "POSITIVE",
+            Relevance = "INDICATION_RELATED"
+        };
+
+        var isEligible = policy.IsEligibleForPrimary(concept);
+
+        Assert.True(isEligible);
+    }
+
+    [Fact]
+    public void RejectsIncidentalConceptsForPrimary()
+    {
+        var policy = new RadiologyIcdPolicy();
+        var concept = new RadiologyConcept
+        {
+            SourcePriority = "IMPRESSION",
+            Certainty = "CONFIRMED",
+            Polarity = "POSITIVE",
+            Relevance = "INCIDENTAL"
+        };
+
+        var isEligible = policy.IsEligibleForPrimary(concept);
+
+        Assert.False(isEligible);
+    }
 }

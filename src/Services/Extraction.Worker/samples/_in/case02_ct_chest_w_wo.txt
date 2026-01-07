@@ -1,0 +1,4 @@
+INDICATION: Chest pain.
+TECHNIQUE: CT CHEST W/WO CONTRAST.
+FINDINGS: Pneumonia present.
+IMPRESSION: Pneumonia.

@@ -1,0 +1,4 @@
+INDICATION: Knee pain.
+TECHNIQUE: XR KNEE 4 VIEWS.
+FINDINGS: Fracture seen.
+IMPRESSION: Fracture.

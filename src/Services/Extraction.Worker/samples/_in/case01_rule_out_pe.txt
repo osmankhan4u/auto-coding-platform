@@ -1,0 +1,4 @@
+INDICATION: Rule out pulmonary embolism.
+TECHNIQUE: CT CHEST WITH CONTRAST.
+FINDINGS: No pneumothorax.
+IMPRESSION: No evidence of pulmonary embolism.

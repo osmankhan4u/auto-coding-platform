@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coding.Worker", "src\Servic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coding.Worker.Tests", "src\Services\Coding.Worker.Tests\Coding.Worker.Tests.csproj", "{A4F27827-9D96-04B2-0630-750F81353FD6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadiologyBestPracticeVerificationTests", "tests\RadiologyBestPracticeVerificationTests.csproj", "{9A0BC859-0F6A-4E28-9D6D-1C5E0C6F5E1D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminology.Api", "src\Services\Terminology.Api\Terminology.Api.csproj", "{B9C0487B-788F-D17C-6FF7-220A68E4F493}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminology.Data", "src\Shared\Terminology.Data\Terminology.Data.csproj", "{6B7B0F1F-5F15-4D9A-94A6-88C0E0C49B3E}"
@@ -46,6 +48,10 @@ Global
 		{A4F27827-9D96-04B2-0630-750F81353FD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4F27827-9D96-04B2-0630-750F81353FD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4F27827-9D96-04B2-0630-750F81353FD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A0BC859-0F6A-4E28-9D6D-1C5E0C6F5E1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A0BC859-0F6A-4E28-9D6D-1C5E0C6F5E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A0BC859-0F6A-4E28-9D6D-1C5E0C6F5E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A0BC859-0F6A-4E28-9D6D-1C5E0C6F5E1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B9C0487B-788F-D17C-6FF7-220A68E4F493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B9C0487B-788F-D17C-6FF7-220A68E4F493}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9C0487B-788F-D17C-6FF7-220A68E4F493}.Release|Any CPU.ActiveCfg = Release|Any CPU

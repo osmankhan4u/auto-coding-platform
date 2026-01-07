@@ -8,9 +8,9 @@ public sealed class SafetyGate
     {
         var flags = new List<string>();
 
-        if (!HasIndicationText(encounter))
+        if (!HasIndicationOrImpression(encounter))
         {
-            flags.Add("MISSING_INDICATION");
+            flags.Add("MISSING_INDICATION_OR_IMPRESSION");
         }
 
         if (encounter.DocumentationCompleteness.Score < 0.70)
@@ -33,9 +33,14 @@ public sealed class SafetyGate
         return new SafetyGateResult(flags.Count == 0, flags);
     }
 
-    private static bool HasIndicationText(ExtractedRadiologyEncounter encounter)
+    private static bool HasIndicationOrImpression(ExtractedRadiologyEncounter encounter)
     {
         if (!string.IsNullOrWhiteSpace(encounter.IndicationText))
+        {
+            return true;
+        }
+
+        if (encounter.ImpressionConcepts is { Count: > 0 })
         {
             return true;
         }
@@ -44,6 +49,12 @@ public sealed class SafetyGate
             encounter.Sections.TryGetValue("Indication", out var indicationText))
         {
             return !string.IsNullOrWhiteSpace(indicationText);
+        }
+
+        if (encounter.Sections is { Count: > 0 } &&
+            encounter.Sections.TryGetValue("Impression", out var impressionText))
+        {
+            return !string.IsNullOrWhiteSpace(impressionText);
         }
 
         return false;

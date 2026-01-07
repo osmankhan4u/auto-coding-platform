@@ -1,0 +1,4 @@
+INDICATION: RUQ pain.
+TECHNIQUE: US ABDOMEN LIMITED.
+FINDINGS: No hydronephrosis.
+IMPRESSION: No hydronephrosis.

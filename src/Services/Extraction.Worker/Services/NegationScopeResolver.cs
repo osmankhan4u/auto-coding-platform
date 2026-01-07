@@ -8,6 +8,8 @@ public sealed class NegationScopeResolver
         "denies",
         "without",
         "negative for",
+        "no evidence of",
+        "rule out",
         "free of",
         "absence of",
         "not"

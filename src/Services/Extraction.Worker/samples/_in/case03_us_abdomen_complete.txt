@@ -1,0 +1,4 @@
+INDICATION: RUQ pain.
+TECHNIQUE: US ABDOMEN COMPLETE.
+FINDINGS: Gallstones present.
+IMPRESSION: Cholelithiasis.

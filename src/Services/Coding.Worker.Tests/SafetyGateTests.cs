@@ -19,7 +19,33 @@ public sealed class SafetyGateTests
         var result = gate.Evaluate(encounter);
 
         Assert.False(result.CanAutoSelect);
-        Assert.Contains("MISSING_INDICATION", result.Flags);
+        Assert.Contains("MISSING_INDICATION_OR_IMPRESSION", result.Flags);
+    }
+
+    [Fact]
+    public void ImpressionAllowsAutoPrimaryWhenIndicationMissing()
+    {
+        var gate = new SafetyGate();
+        var encounter = new ExtractedRadiologyEncounter
+        {
+            Modality = "CT",
+            DocumentationCompleteness = new DocumentationCompleteness { Score = 0.95 },
+            ImpressionConcepts = new List<RadiologyConcept>
+            {
+                new()
+                {
+                    Text = "pneumonia",
+                    SourcePriority = "IMPRESSION",
+                    Certainty = "CONFIRMED",
+                    Polarity = "POSITIVE"
+                }
+            }
+        };
+
+        var result = gate.Evaluate(encounter);
+
+        Assert.True(result.CanAutoSelect);
+        Assert.DoesNotContain("MISSING_INDICATION_OR_IMPRESSION", result.Flags);
     }
 
     [Fact]

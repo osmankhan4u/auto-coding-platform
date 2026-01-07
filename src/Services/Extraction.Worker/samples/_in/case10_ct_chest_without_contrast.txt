@@ -1,0 +1,4 @@
+INDICATION: Chest pain.
+TECHNIQUE: CT CHEST WITHOUT CONTRAST.
+FINDINGS: No pneumonia.
+IMPRESSION: No pneumonia.

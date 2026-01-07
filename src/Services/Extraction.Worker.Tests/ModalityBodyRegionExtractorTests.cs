@@ -9,7 +9,7 @@ public sealed class ModalityBodyRegionExtractorTests
     [InlineData("CT CHEST W CONTRAST", "CT", "CHEST")]
     [InlineData("MRI BRAIN", "MRI", "BRAIN_HEAD")]
     [InlineData("US ABDOMEN", "US", "ABDOMEN")]
-    [InlineData("X-RAY KNEE", "UNKNOWN", "UNKNOWN")]
+    [InlineData("X-RAY KNEE", "XR", "KNEE")]
     public void Extract_DetectsModalityAndBodyRegion(string text, string expectedModality, string expectedRegion)
     {
         var extractor = new ModalityBodyRegionExtractor();

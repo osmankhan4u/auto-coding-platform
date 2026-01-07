@@ -1,0 +1,4 @@
+INDICATION: Knee pain.
+TECHNIQUE: X-RAY KNEE 2 VIEWS.
+FINDINGS: No fracture.
+IMPRESSION: No fracture.
