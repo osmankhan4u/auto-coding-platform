@@ -5,11 +5,14 @@ using Microsoft.Extensions.Options;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.Configure<TerminologyOptions>(builder.Configuration.GetSection("Terminology"));
+builder.Services.Configure<RulesOptions>(builder.Configuration.GetSection("Rules"));
 
 builder.Services.AddSingleton<SafetyGate>();
 builder.Services.AddSingleton<RadiologyIcdPolicy>();
 builder.Services.AddSingleton<RadiologyCptCodingService>();
 builder.Services.AddSingleton<IBundlingValidator, BundlingValidator>();
+builder.Services.AddSingleton<IRulesEngine, RulesEngine>();
+builder.Services.AddSingleton<ClaimContextBuilder>();
 builder.Services.AddSingleton<RadiologyCodingService>();
 builder.Services.AddHttpClient<TerminologyClient>((serviceProvider, client) =>
 {

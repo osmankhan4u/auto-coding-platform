@@ -7,6 +7,7 @@ public sealed class RadiologyIcdCodingResult
     public IcdFinalSelection FinalSelection { get; set; } = new();
     public CptCodingResult CptResult { get; set; } = new();
     public BundlingValidationResult BundlingValidation { get; set; } = new();
+    public RuleEvaluationResult RuleEvaluation { get; set; } = new();
     public List<string> SafetyFlags { get; set; } = new();
     public DecisionTrace Trace { get; set; } = new();
 }

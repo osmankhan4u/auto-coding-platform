@@ -1,7 +1,7 @@
 # Radiology Best Practice Verification (MVP)
 
 ## PR Description
-- Summary: Added radiology attribute extraction (laterality/contrast/views/guidance/intervention), deterministic CPT mapping with audit fields, bundling validator stub, and a 10-case best-practice test suite with sample reports.
+- Summary: Added radiology attribute extraction (laterality/contrast/views/guidance/intervention), deterministic CPT mapping with audit fields, bundling validation rules, a payer rules engine scaffold, and a 10-case best-practice test suite with sample reports.
 - Risks: CPT mapping is intentionally narrow; contrast/laterality regexes may miss uncommon phrasing; ICD specificity still depends on Terminology API scoring.
 - Testing: Added `RadiologyBestPracticeVerificationTests` (not run in this environment).
 
@@ -55,6 +55,39 @@
 ### E) Compliance & Auditability
 | Checklist Item | Status | Evidence | Notes/Recommendations |
 | --- | --- | --- | --- |
-| E1. NCCI/bundling validation step exists | Partial | `src/Services/Coding.Worker/Services/IBundlingValidator.cs`, `BundlingValidator.Validate` | Interface + placeholder implementation with TODO note. |
+| E1. NCCI/bundling validation step exists | Implemented | `src/Services/Coding.Worker/Services/IBundlingValidator.cs`, `src/Services/Coding.Worker/Services/BundlingValidator.cs` | Minimal NCCI/bundling rules applied (duplicate CPT and guidance bundling); expand ruleset for broader coverage. |
 | E2. Code outputs include rule_id, rule_version, confidence, evidence_span, exclusion reasons | Partial | `src/Services/Coding.Worker/Contracts/IcdCandidate.cs`, `src/Services/Coding.Worker/Contracts/CptCodingResult.cs` | Fields added; expand `ExclusionReasons` for ICD selection logic as needed. |
 | E3. End-to-end tests for >=10 tricky reports | Implemented | `tests/RadiologyBestPracticeVerificationTests.cs`, `src/Services/Extraction.Worker/samples/_in` | 10 de-identified sample reports with CPT/ICD assertions. |
+
+## Article Crosswalk: "Mastering Radiology Coding: 12 Essential Guidelines"
+Source: https://curogram.com/blog/mastering-radiology-coding-guidelines (provided by user)
+
+| Guideline | Status | Evidence | Notes/Recommendations |
+| --- | --- | --- | --- |
+| 1. Documentation completeness (indication/findings/impression clarity) | Partial | `src/Services/Extraction.Worker/Services/SectionDetector.cs`, `src/Services/Extraction.Worker/Services/DocumentationCompletenessScorer.cs` | Section detection + completeness scoring exist; add patient/DOS/procedure metadata fields if required for audit. |
+| 2. Diagnostic vs interventional distinction | Partial | `src/Services/Extraction.Worker/Services/RadiologyAttributesExtractor.cs`, `src/Services/Coding.Worker/Services/RadiologyCptCodingService.cs` | Intervention/guidance flags exist; add diagnostic vs therapeutic classification and component coding. |
+| 3. Modifiers (26/TC/RT/LT) | Partial | `src/Services/Coding.Worker/Services/RadiologyCptCodingService.cs` | Modifiers applied by `BillingContext`/laterality; extraction currently defaults to GLOBAL and lacks modifier-level rationale. |
+| 4. ICD-10-CM specificity | Partial | `src/Services/Coding.Worker/Services/RadiologyCodingService.cs` | Specificity depends on terminology ranking; add tie-breakers or explicit specificity scoring. |
+| 5. NCCI bundling/unbundling | Partial | `src/Services/Coding.Worker/Services/BundlingValidator.cs` | Minimal rules enforced (duplicate CPT, guidance bundling); expand to full NCCI edits and quarterly updates. |
+| 6. Stay current with code updates | Missing | N/A | Add versioned update cadence and configuration for CPT/ICD/HCPCS/LCD/NCD changes. |
+| 7. With/without contrast accuracy | Implemented | `src/Services/Extraction.Worker/Services/RadiologyAttributesExtractor.cs`, `src/Services/Coding.Worker/Services/RadiologyCptCodingService.cs` | Contrast state extracted and used for CPT mapping. |
+| 8. Component coding for interventional procedures | Missing | N/A | Add IR component model (primary, S&I, catheter, supply) + bundling logic. |
+| 9. Medical necessity alignment | Partial | `src/Services/Coding.Worker/Services/RadiologyCodingService.cs` | ICDs generated from indication/impression; no CPT/ICD necessity validator. |
+| 10. MIPS/quality reporting codes | Missing | N/A | Add optional quality code generation rules if in scope. |
+| 11. Operative report detail capture for IR | Partial | `src/Services/Extraction.Worker/Services/RadiologyAttributesExtractor.cs` | Captures guidance/laterality/intervention but not full operative component parsing. |
+| 12. Denial management/audit readiness | Partial | `src/Services/Coding.Worker/Contracts/IcdCandidate.cs`, `src/Services/Coding.Worker/Contracts/CptCodingResult.cs` | Evidence/rationale fields exist; add denial analytics loop and audit-ready exports if required. |
+
+## Competitive Capability Gaps (Auto-Coding AI)
+| Capability | Status | Evidence | Notes/Recommendations |
+| --- | --- | --- | --- |
+| Clinical semantic understanding | Partial | `src/Services/Extraction.Worker/Services/ClinicalConceptExtractor.cs`, `src/Services/Terminology.Api/Services/TerminologySearchService.cs` | Rule-based extraction + terminology search; add richer NLP/ontology normalization and broader concept packs. |
+| Workflow integration | Missing | `src/Services/Extraction.Worker/Worker.cs`, `src/Services/Coding.Worker/Worker.cs` | File-based sample pipeline only; add EHR/FHIR/HL7 ingestion, queueing, and review UI integration. |
+| Payer-specific rules engine | Partial | `src/Services/Coding.Worker/Services/RulesEngine.cs`, `src/Services/Coding.Worker/Models/ClaimContext.cs`, `src/Services/Coding.Worker/appsettings.json` | Canonical claim model + layered rule packs + evaluation contract added; expand rule types for auth, POS, frequency, and client overrides. |
+| Auto-scrubbing & denial prediction | Missing | N/A | Implement pre-claim edits (NCCI/LCD/medical necessity) and denial prediction heuristics/models. |
+| AI augmentation of coder decision-making | Partial | `src/Services/Coding.Worker/Contracts/DecisionTrace.cs`, `IcdCandidate` | Evidence/trace output exists; add interactive UI, confidence routing, and feedback loop. |
+
+## Payer Rules Engine (MVP)
+- Canonical claim model: `src/Services/Coding.Worker/Models/ClaimContext.cs`
+- Rule pack schema: `src/Services/Coding.Worker/Services/RulesOptions.cs`
+- Evaluation contract: `src/Services/Coding.Worker/Contracts/RuleEvaluationResult.cs`
+- Layered execution order: GLOBAL -> NCCI_MUE -> PAYER -> CLIENT (`src/Services/Coding.Worker/Services/RulesEngine.cs`)

@@ -3,6 +3,8 @@ namespace Extraction.Worker.Models;
 public sealed class ExtractedRadiologyEncounter
 {
     public string EncounterId { get; set; } = string.Empty;
+    public string PayerId { get; set; } = "DEFAULT";
+    public DateOnly? DateOfService { get; set; }
     public string? Modality { get; set; }
     public string? BodyRegion { get; set; }
     public List<string> BodyRegions { get; set; } = new();

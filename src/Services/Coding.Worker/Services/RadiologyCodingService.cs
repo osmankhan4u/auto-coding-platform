@@ -12,6 +12,8 @@ public sealed class RadiologyCodingService
     private readonly RadiologyIcdPolicy _policy;
     private readonly RadiologyCptCodingService _cptCodingService;
     private readonly IBundlingValidator _bundlingValidator;
+    private readonly IRulesEngine _rulesEngine;
+    private readonly ClaimContextBuilder _claimContextBuilder;
     private readonly ILogger<RadiologyCodingService> _logger;
 
     public RadiologyCodingService(
@@ -20,6 +22,8 @@ public sealed class RadiologyCodingService
         RadiologyIcdPolicy policy,
         RadiologyCptCodingService cptCodingService,
         IBundlingValidator bundlingValidator,
+        IRulesEngine rulesEngine,
+        ClaimContextBuilder claimContextBuilder,
         ILogger<RadiologyCodingService> logger)
     {
         _terminologyClient = terminologyClient;
@@ -27,6 +31,8 @@ public sealed class RadiologyCodingService
         _policy = policy;
         _cptCodingService = cptCodingService;
         _bundlingValidator = bundlingValidator;
+        _rulesEngine = rulesEngine;
+        _claimContextBuilder = claimContextBuilder;
         _logger = logger;
     }
 
@@ -85,6 +91,15 @@ public sealed class RadiologyCodingService
 
         var cptResult = _cptCodingService.Generate(encounter);
         var bundlingValidation = _bundlingValidator.Validate(encounter, cptResult);
+        var claimContext = _claimContextBuilder.Build(encounter, cptResult, new RadiologyIcdCodingResult
+        {
+            PrimaryCandidates = primaryCandidates,
+            SecondaryCandidates = secondaryCandidates,
+            FinalSelection = finalSelection,
+            CptResult = cptResult,
+            BundlingValidation = bundlingValidation
+        });
+        var ruleEvaluation = _rulesEngine.Evaluate(claimContext);
 
         return new RadiologyIcdCodingResult
         {
@@ -93,6 +108,7 @@ public sealed class RadiologyCodingService
             FinalSelection = finalSelection,
             CptResult = cptResult,
             BundlingValidation = bundlingValidation,
+            RuleEvaluation = ruleEvaluation,
             SafetyFlags = safetyResult.Flags,
             Trace = trace
         };

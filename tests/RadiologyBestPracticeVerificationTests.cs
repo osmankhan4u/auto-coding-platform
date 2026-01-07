@@ -7,6 +7,7 @@ using Coding.Worker.Models;
 using Coding.Worker.Services;
 using Extraction.Worker.Services;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace RadiologyBestPracticeVerificationTests;
@@ -286,6 +287,8 @@ public sealed class RadiologyBestPracticeVerificationTests
             policy,
             cptService,
             bundlingValidator,
+            new RulesEngine(Options.Create(new RulesOptions())),
+            new ClaimContextBuilder(),
             NullLogger<RadiologyCodingService>.Instance);
 
         return (codingService, bundlingValidator);
@@ -312,6 +315,8 @@ public sealed class RadiologyBestPracticeVerificationTests
         return new Coding.Worker.Models.ExtractedRadiologyEncounter
         {
             EncounterId = encounter.EncounterId,
+            PayerId = encounter.PayerId,
+            DateOfService = encounter.DateOfService,
             Modality = encounter.Modality,
             BodyRegion = encounter.BodyRegion,
             BodyRegions = encounter.BodyRegions,
