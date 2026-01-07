@@ -14,7 +14,8 @@ public sealed class Worker : BackgroundService
     private static readonly JsonSerializerOptions OutputJsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
+        WriteIndented = true,
+        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
     };
 
     private readonly ILogger<Worker> _logger;

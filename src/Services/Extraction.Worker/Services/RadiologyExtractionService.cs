@@ -85,6 +85,7 @@ public sealed class RadiologyExtractionService
         return new ExtractedRadiologyEncounter
         {
             EncounterId = encounterId,
+            ReportText = reportText,
             Modality = modalityResult.Modality,
             BodyRegion = modalityResult.BodyRegion,
             BodyRegions = bodyRegions,

@@ -1,0 +1,8 @@
+{
+  "status": "NeedsInfo",
+  "severity": "NonBlocking",
+  "actions": [ "AutoRelease", "RequestInfo", "RoutePredicted" ],
+  "winningRule": {
+    "ruleId": "AUTH_REQUIRED_CT"
+  }
+}

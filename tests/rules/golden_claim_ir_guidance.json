@@ -1,0 +1,54 @@
+{
+  "header": {
+    "payerId": "DEFAULT",
+    "planId": "",
+    "state": "",
+    "placeOfService": "11",
+    "dateOfService": null,
+    "renderingProviderNpi": "1111111111",
+    "billingProviderNpi": "2222222222",
+    "orderingProviderNpi": "",
+    "renderingProviderSpecialty": ""
+  },
+  "patient": {
+    "patientId": "PAT-1",
+    "age": 60,
+    "sex": "F",
+    "eligibilityStatus": ""
+  },
+  "encounter": {
+    "visitType": "",
+    "facilityId": "",
+    "referrerId": "",
+    "admitDate": null,
+    "dischargeDate": null
+  },
+  "diagnoses": [
+    {
+      "code": "K65.1",
+      "isPrincipal": true,
+      "presentOnAdmission": ""
+    }
+  ],
+  "procedures": [
+    {
+      "code": "49406",
+      "units": 1,
+      "modifiers": [],
+      "laterality": ""
+    },
+    {
+      "code": "77012",
+      "units": 1,
+      "modifiers": [],
+      "laterality": ""
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceId": "EVID-0001",
+      "source": "Guidance",
+      "snippet": "CT guidance"
+    }
+  ]
+}

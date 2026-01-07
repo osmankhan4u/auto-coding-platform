@@ -16,4 +16,10 @@
     <ProjectReference Include="..\src\Services\Extraction.Worker\Extraction.Worker.csproj" />
     <ProjectReference Include="..\src\Services\Coding.Worker\Coding.Worker.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="rules\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

@@ -25,6 +25,7 @@ public sealed class ClaimHeader
 
 public sealed class PatientContext
 {
+    public string PatientId { get; set; } = string.Empty;
     public int? Age { get; set; }
     public string Sex { get; set; } = string.Empty;
     public string EligibilityStatus { get; set; } = string.Empty;

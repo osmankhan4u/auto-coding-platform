@@ -30,7 +30,9 @@ public sealed class RadiologyIcdPolicy
     }
 
     public bool IsEligibleForSecondary(RadiologyConcept concept) =>
-        !IsExcludedConcept(concept) && !IsIncidentalConcept(concept);
+        !IsExcludedConcept(concept) &&
+        !IsIncidentalConcept(concept) &&
+        !IsFindingsUnclear(concept);
 
     private static bool IsIndicationConcept(RadiologyConcept concept) =>
         string.Equals(concept.SourcePriority, "INDICATION", StringComparison.OrdinalIgnoreCase);
@@ -40,6 +42,10 @@ public sealed class RadiologyIcdPolicy
 
     private static bool IsIncidentalConcept(RadiologyConcept concept) =>
         string.Equals(concept.Relevance, "INCIDENTAL", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsFindingsUnclear(RadiologyConcept concept) =>
+        string.Equals(concept.SourcePriority, "FINDINGS", StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(concept.Relevance, "UNCLEAR", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsExcludedConcept(RadiologyConcept concept) =>
         string.Equals(concept.Certainty, "RULED_OUT", StringComparison.OrdinalIgnoreCase) ||

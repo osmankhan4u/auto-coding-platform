@@ -1,5 +1,6 @@
 using Coding.Worker.Models;
 using Coding.Worker.Services;
+using Coding.Worker.Contracts;
 using Microsoft.Extensions.Options;
 using Xunit;
 
@@ -10,10 +11,19 @@ public sealed class RulesEngineTests
     [Fact]
     public void Evaluate_ReturnsNoPacksWhenNoneConfigured()
     {
-        var engine = new RulesEngine(Options.Create(new RulesOptions()));
-        var result = engine.Evaluate(new ClaimContext());
+        var engine = new RulesEngine(Options.Create(new RulesOptions()), Array.Empty<IRuleCategoryValidator>());
+        var result = engine.Evaluate(new ClaimContext
+        {
+            Header = new ClaimHeader
+            {
+                DateOfService = new DateOnly(2025, 1, 1),
+                PlaceOfService = "11",
+                RenderingProviderNpi = "1111111111",
+                BillingProviderNpi = "2222222222"
+            }
+        });
 
-        Assert.Equal("PASS", result.Status);
+        Assert.Equal(RuleStatus.Pass, result.Status);
         Assert.Contains("No rule packs applicable.", result.Notes);
     }
 
@@ -35,6 +45,7 @@ public sealed class RulesEngineTests
                         {
                             RuleId = "CT_CHEST_REQUIRE_DX",
                             RuleVersion = "1.0",
+                            Category = RuleCategory.MedicalNecessity,
                             Trigger = new RuleTrigger
                             {
                                 CptCodes = new List<string> { "71260" },
@@ -42,9 +53,9 @@ public sealed class RulesEngineTests
                             },
                             Action = new RuleAction
                             {
-                                Status = "PASS",
-                                Severity = "NON_BLOCKING",
-                                Action = "auto_release"
+                                Status = RuleStatus.Pass,
+                                Severity = RuleSeverity.NonBlocking,
+                                Action = RuleActionType.AutoRelease
                             },
                             Message = "CT chest supported."
                         }
@@ -53,19 +64,24 @@ public sealed class RulesEngineTests
             }
         });
 
-        var engine = new RulesEngine(options);
+        var engine = new RulesEngine(options, Array.Empty<IRuleCategoryValidator>());
         var claim = new ClaimContext
         {
-            Header = new ClaimHeader { PayerId = "DEFAULT" },
+            Header = new ClaimHeader
+            {
+                PayerId = "DEFAULT",
+                DateOfService = new DateOnly(2025, 1, 1),
+                PlaceOfService = "11",
+                RenderingProviderNpi = "1111111111",
+                BillingProviderNpi = "2222222222"
+            },
             Procedures = new List<ProcedureEntry> { new() { Code = "71260" } },
             Diagnoses = new List<DiagnosisEntry> { new() { Code = "R07.9" } }
         };
 
         var result = engine.Evaluate(claim);
 
-        Assert.Single(result.Outcomes);
-        Assert.Equal("PASS", result.Outcomes[0].Status);
-        Assert.Equal("auto_release", result.Outcomes[0].Action);
+        Assert.Contains(result.Outcomes, outcome => outcome.Action == RuleActionType.AutoRelease);
     }
 
     [Fact]
@@ -86,15 +102,16 @@ public sealed class RulesEngineTests
                         new()
                         {
                             RuleId = "ACTIVE",
+                            Category = RuleCategory.MedicalNecessity,
                             Trigger = new RuleTrigger { CptCodes = new List<string> { "71260" } },
-                            Action = new RuleAction { Status = "WARN", Severity = "NON_BLOCKING", Action = "route_predicted" }
+                            Action = new RuleAction { Status = RuleStatus.Warn, Severity = RuleSeverity.NonBlocking, Action = RuleActionType.RoutePredicted }
                         }
                     }
                 }
             }
         });
 
-        var engine = new RulesEngine(options);
+        var engine = new RulesEngine(options, Array.Empty<IRuleCategoryValidator>());
         var claim = new ClaimContext
         {
             Header = new ClaimHeader { PayerId = "DEFAULT", DateOfService = new DateOnly(2024, 6, 1) },
@@ -123,6 +140,7 @@ public sealed class RulesEngineTests
                         new()
                         {
                             RuleId = "REQ_DOS",
+                            Category = RuleCategory.Integrity,
                             Trigger = new RuleTrigger
                             {
                                 CptCodes = new List<string> { "71260" },
@@ -130,9 +148,9 @@ public sealed class RulesEngineTests
                             },
                             Action = new RuleAction
                             {
-                                Status = "NEEDS_INFO",
-                                Severity = "BLOCKING",
-                                Action = "request_info"
+                                Status = RuleStatus.NeedsInfo,
+                                Severity = RuleSeverity.Blocking,
+                                Action = RuleActionType.RequestInfo
                             }
                         }
                     }
@@ -140,7 +158,7 @@ public sealed class RulesEngineTests
             }
         });
 
-        var engine = new RulesEngine(options);
+        var engine = new RulesEngine(options, Array.Empty<IRuleCategoryValidator>());
         var claim = new ClaimContext
         {
             Header = new ClaimHeader { PayerId = "DEFAULT" },
@@ -149,8 +167,55 @@ public sealed class RulesEngineTests
 
         var result = engine.Evaluate(claim);
 
-        Assert.Single(result.Outcomes);
-        Assert.Equal("NEEDS_INFO", result.Outcomes[0].Status);
-        Assert.Equal("request_info", result.Outcomes[0].Action);
+        Assert.True(result.Outcomes.Count >= 1);
+        Assert.Contains(result.Outcomes, outcome =>
+            outcome.Status == RuleStatus.NeedsInfo &&
+            outcome.Action == RuleActionType.RequestInfo &&
+            outcome.Layer == "GLOBAL");
+    }
+
+    [Fact]
+    public void Evaluate_FlagsMissingRequiredHeaderFields()
+    {
+        var engine = new RulesEngine(Options.Create(new RulesOptions()), Array.Empty<IRuleCategoryValidator>());
+        var claim = new ClaimContext
+        {
+            Header = new ClaimHeader
+            {
+                PayerId = string.Empty,
+                PlaceOfService = string.Empty,
+                RenderingProviderNpi = string.Empty,
+                BillingProviderNpi = string.Empty
+            }
+        };
+
+        var result = engine.Evaluate(claim);
+
+        Assert.Contains(result.Outcomes, outcome => outcome.RuleId == "GLOBAL_MISSING_PAYER");
+        Assert.Contains(result.Outcomes, outcome => outcome.RuleId == "GLOBAL_MISSING_POS");
+        Assert.Contains(result.Outcomes, outcome => outcome.RuleId == "GLOBAL_MISSING_RENDERING_NPI");
+        Assert.Contains(result.Outcomes, outcome => outcome.RuleId == "GLOBAL_MISSING_BILLING_NPI");
+    }
+
+    [Fact]
+    public void Evaluate_FlagsInvalidModifierFormat()
+    {
+        var engine = new RulesEngine(Options.Create(new RulesOptions()), Array.Empty<IRuleCategoryValidator>());
+        var claim = new ClaimContext
+        {
+            Header = new ClaimHeader { DateOfService = new DateOnly(2025, 1, 1) },
+            Procedures = new List<ProcedureEntry>
+            {
+                new()
+                {
+                    Code = "71260",
+                    Modifiers = new List<string> { "2", "ABC" }
+                }
+            }
+        };
+
+        var result = engine.Evaluate(claim);
+
+        Assert.Contains(result.Outcomes, outcome => outcome.RuleId == "GLOBAL_INVALID_MODIFIER");
     }
 }

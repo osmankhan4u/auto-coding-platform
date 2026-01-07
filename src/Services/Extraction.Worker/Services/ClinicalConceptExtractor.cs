@@ -31,6 +31,8 @@ public sealed class ClinicalConceptExtractor
     {
         var concepts = new List<RadiologyConcept>();
         var indicationConcepts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var hasIndicationText = sections.TryGetValue("Indication", out var indicationSection) &&
+                                !string.IsNullOrWhiteSpace(indicationSection.ContentText);
 
         foreach (var sectionName in new[] { "Indication", "Findings", "Impression" })
         {
@@ -101,7 +103,15 @@ public sealed class ClinicalConceptExtractor
 
             if (indicationConcepts.Count == 0)
             {
-                concept.Relevance = "UNCLEAR";
+                if (hasIndicationText &&
+                    string.Equals(concept.SourcePriority, "FINDINGS", StringComparison.OrdinalIgnoreCase))
+                {
+                    concept.Relevance = "INCIDENTAL";
+                }
+                else
+                {
+                    concept.Relevance = "UNCLEAR";
+                }
             }
             else if (indicationConcepts.Contains(concept.Text))
             {

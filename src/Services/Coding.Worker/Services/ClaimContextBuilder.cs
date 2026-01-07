@@ -84,7 +84,7 @@ public sealed class ClaimContextBuilder
             {
                 EvidenceId = $"EVID-{index++:D4}",
                 Source = "Indication",
-                Snippet = span
+                Snippet = ExtractSnippet(encounter, span)
             };
         }
 
@@ -94,8 +94,156 @@ public sealed class ClaimContextBuilder
             {
                 EvidenceId = $"EVID-{index++:D4}",
                 Source = "Modality",
-                Snippet = span
+                Snippet = ExtractSnippet(encounter, span)
             };
         }
+
+        foreach (var span in encounter.BodyRegionEvidenceSpans)
+        {
+            yield return new SupportingEvidence
+            {
+                EvidenceId = $"EVID-{index++:D4}",
+                Source = "BodyRegion",
+                Snippet = ExtractSnippet(encounter, span)
+            };
+        }
+
+        foreach (var span in encounter.ContrastEvidenceSpans)
+        {
+            yield return new SupportingEvidence
+            {
+                EvidenceId = $"EVID-{index++:D4}",
+                Source = "Contrast",
+                Snippet = ExtractSnippet(encounter, span)
+            };
+        }
+
+        foreach (var span in encounter.ViewsOrCompletenessEvidenceSpans)
+        {
+            yield return new SupportingEvidence
+            {
+                EvidenceId = $"EVID-{index++:D4}",
+                Source = "ViewsOrCompleteness",
+                Snippet = ExtractSnippet(encounter, span)
+            };
+        }
+
+        foreach (var span in encounter.LateralityEvidenceSpans)
+        {
+            yield return new SupportingEvidence
+            {
+                EvidenceId = $"EVID-{index++:D4}",
+                Source = "Laterality",
+                Snippet = ExtractSnippet(encounter, span)
+            };
+        }
+
+        foreach (var span in encounter.GuidanceEvidenceSpans)
+        {
+            yield return new SupportingEvidence
+            {
+                EvidenceId = $"EVID-{index++:D4}",
+                Source = "Guidance",
+                Snippet = ExtractSnippet(encounter, span)
+            };
+        }
+
+        foreach (var span in encounter.InterventionEvidenceSpans)
+        {
+            yield return new SupportingEvidence
+            {
+                EvidenceId = $"EVID-{index++:D4}",
+                Source = "Intervention",
+                Snippet = ExtractSnippet(encounter, span)
+            };
+        }
+    }
+
+    private static string ExtractSnippet(ExtractedRadiologyEncounter encounter, string span)
+    {
+        if (string.IsNullOrWhiteSpace(span))
+        {
+            return string.Empty;
+        }
+
+        if (!TryParseSpan(span, out var section, out var start, out var end))
+        {
+            return span;
+        }
+
+        if (!string.IsNullOrWhiteSpace(encounter.ReportText) && start >= 0 && end <= encounter.ReportText.Length)
+        {
+            return SafeSnippet(encounter.ReportText, start, end);
+        }
+
+        if (encounter.Sections.TryGetValue(section, out var content))
+        {
+            if (start >= 0 && end <= content.Length)
+            {
+                return SafeSnippet(content, start, end);
+            }
+
+            return LimitSnippet(content);
+        }
+
+        if (!string.IsNullOrWhiteSpace(encounter.ReportText))
+        {
+            return LimitSnippet(encounter.ReportText);
+        }
+
+        return span;
+    }
+
+    private static bool TryParseSpan(string span, out string section, out int start, out int end)
+    {
+        section = string.Empty;
+        start = -1;
+        end = -1;
+
+        var parts = span.Split(':', 2);
+        if (parts.Length != 2)
+        {
+            return false;
+        }
+
+        section = parts[0];
+        var rangeParts = parts[1].Split('-', 2);
+        if (rangeParts.Length != 2)
+        {
+            return false;
+        }
+
+        return int.TryParse(rangeParts[0], out start) && int.TryParse(rangeParts[1], out end);
+    }
+
+    private static string SafeSnippet(string content, int start, int end)
+    {
+        if (string.IsNullOrWhiteSpace(content) || start < 0 || end <= start)
+        {
+            return string.Empty;
+        }
+
+        if (start >= content.Length)
+        {
+            return string.Empty;
+        }
+
+        if (end > content.Length)
+        {
+            end = content.Length;
+        }
+
+        return content.Substring(start, end - start).Trim();
+    }
+
+    private static string LimitSnippet(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return string.Empty;
+        }
+
+        var trimmed = content.Trim();
+        return trimmed.Length <= 200 ? trimmed : trimmed.Substring(0, 200);
     }
 }

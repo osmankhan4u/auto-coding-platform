@@ -1,0 +1,48 @@
+{
+  "header": {
+    "payerId": "DEFAULT",
+    "planId": "",
+    "state": "",
+    "placeOfService": "11",
+    "dateOfService": "2025-01-01",
+    "renderingProviderNpi": "1111111111",
+    "billingProviderNpi": "2222222222",
+    "orderingProviderNpi": "",
+    "renderingProviderSpecialty": ""
+  },
+  "patient": {
+    "patientId": "PAT-1",
+    "age": 35,
+    "sex": "M",
+    "eligibilityStatus": ""
+  },
+  "encounter": {
+    "visitType": "",
+    "facilityId": "",
+    "referrerId": "",
+    "admitDate": null,
+    "dischargeDate": null
+  },
+  "diagnoses": [
+    {
+      "code": "S82.90",
+      "isPrincipal": true,
+      "presentOnAdmission": ""
+    }
+  ],
+  "procedures": [
+    {
+      "code": "73564",
+      "units": 1,
+      "modifiers": [],
+      "laterality": ""
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceId": "EVID-0001",
+      "source": "Indication",
+      "snippet": "Knee pain"
+    }
+  ]
+}

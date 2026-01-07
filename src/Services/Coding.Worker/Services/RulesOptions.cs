@@ -1,3 +1,5 @@
+using Coding.Worker.Contracts;
+
 namespace Coding.Worker.Services;
 
 public sealed class RulesOptions
@@ -23,6 +25,7 @@ public sealed class RuleDefinition
     public string RuleId { get; set; } = string.Empty;
     public string RuleVersion { get; set; } = "1.0";
     public int Priority { get; set; }
+    public RuleCategory Category { get; set; } = RuleCategory.Integrity;
     public RuleTrigger Trigger { get; set; } = new();
     public RuleAction Action { get; set; } = new();
     public RuleEvidenceRequirement EvidenceRequirement { get; set; } = new();
@@ -40,13 +43,15 @@ public sealed class RuleTrigger
     public List<string> RequiredModifiers { get; set; } = new();
     public List<string> ProviderSpecialties { get; set; } = new();
     public bool RequiresDateOfService { get; set; }
+    public bool RequiresIcdMismatch { get; set; }
+    public int? MinDaysSinceLast { get; set; }
 }
 
 public sealed class RuleAction
 {
-    public string Status { get; set; } = "FAIL";
-    public string Severity { get; set; } = "BLOCKING";
-    public string Action { get; set; } = "request_info";
+    public RuleStatus Status { get; set; } = RuleStatus.Fail;
+    public RuleSeverity Severity { get; set; } = RuleSeverity.Blocking;
+    public RuleActionType Action { get; set; } = RuleActionType.RequestInfo;
 }
 
 public sealed class RuleEvidenceRequirement

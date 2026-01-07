@@ -7,12 +7,12 @@ public sealed class ModalityBodyRegionExtractor
 {
     private static readonly (Regex Regex, string Modality)[] ModalityPatterns =
     {
-        (new Regex(@"\b(?:XRAY|X-RAY|X RAY|RADIOGRAPH)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "XR"),
+        (new Regex(@"\b(?:IR|INTERVENTIONAL RADIOLOGY|ANGIO)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "IR"),
+        (new Regex(@"\b(?:XR|XRAY|X-RAY|X RAY|RADIOGRAPH)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "XR"),
         (new Regex(@"\b(?:CT|C\.T\.|COMPUTED TOMOGRAPHY)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "CT"),
         (new Regex(@"\b(?:MRI|M\.R\.I\.|MAGNETIC RESONANCE)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "MRI"),
         (new Regex(@"\b(?:US|U/S|ULTRASOUND)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "US"),
-        (new Regex(@"\b(?:NM|NUCLEAR MEDICINE|PET|SPECT)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "NM"),
-        (new Regex(@"\b(?:IR|INTERVENTIONAL RADIOLOGY|ANGIO)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "IR")
+        (new Regex(@"\b(?:NM|NUCLEAR MEDICINE|PET|SPECT)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled), "NM")
     };
 
     private static readonly (Regex Regex, string Region)[] BodyRegionPatterns =

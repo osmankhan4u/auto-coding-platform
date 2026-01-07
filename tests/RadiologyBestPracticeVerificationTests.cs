@@ -287,7 +287,7 @@ public sealed class RadiologyBestPracticeVerificationTests
             policy,
             cptService,
             bundlingValidator,
-            new RulesEngine(Options.Create(new RulesOptions())),
+            new RulesEngine(Options.Create(new RulesOptions()), Array.Empty<IRuleCategoryValidator>()),
             new ClaimContextBuilder(),
             NullLogger<RadiologyCodingService>.Instance);
 
@@ -317,6 +317,7 @@ public sealed class RadiologyBestPracticeVerificationTests
             EncounterId = encounter.EncounterId,
             PayerId = encounter.PayerId,
             DateOfService = encounter.DateOfService,
+            ReportText = encounter.ReportText,
             Modality = encounter.Modality,
             BodyRegion = encounter.BodyRegion,
             BodyRegions = encounter.BodyRegions,
